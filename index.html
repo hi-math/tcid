@@ -3,106 +3,223 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AI 에이전트 미리보기</title>
+  <title>함께 만드는 수업 서로 깊어지는 배움 - AI 에이전트</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32x32.png" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <link rel="shortcut icon" href="favicon.ico" />
   <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fonts-archive/Paperlogy/Paperlogy.css" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
   <style>
     :root {
-      --red: #d8432f;
-      --red-deep: #b8321f;
-      --ink: #2b2f36;
-      --muted: #6b7079;
-      --card: #ffffff;
-      --tag: #353a42;
+      --bg-cream: #fceadc;
+      --clay-card: #ffffff;
+      --clay-thumb-bg: #fcf7f1;
+      --ink: #2c2420;
+      --muted: #7d7067;
+      --orange-accent: #e86338;
+      
+      /* 클레이 섀도우 */
+      --card-shadow: 
+        inset 4px 4px 8px rgba(255, 255, 255, 1),
+        inset -5px -5px 10px rgba(210, 185, 165, 0.35),
+        0 18px 36px rgba(160, 130, 105, 0.18),
+        0 6px 14px rgba(160, 130, 105, 0.1);
+
+      --card-shadow-hover: 
+        inset 4px 4px 8px rgba(255, 255, 255, 1),
+        inset -5px -5px 10px rgba(210, 185, 165, 0.35),
+        0 26px 48px rgba(160, 130, 105, 0.28),
+        0 10px 20px rgba(160, 130, 105, 0.15);
+
+      --thumb-clay-shadow: 
+        inset 3px 3px 6px rgba(195, 170, 150, 0.32),
+        inset -3px -3px 6px rgba(255, 255, 255, 0.95),
+        0 4px 12px rgba(160, 130, 105, 0.1);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    html, body { min-height: 100%; }
+    html, body {
+      min-height: 100%;
+      height: 100%;
+      background-color: var(--bg-cream);
+    }
 
     body {
       font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif;
-      background: var(--red) url("assets/bg.png") center / cover no-repeat fixed;
       color: var(--ink);
-    }
-
-    .stage {
+      overflow-x: hidden;
       position: relative;
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 48px 4vw;
     }
 
-    /* 카드가 배경 위에서 또렷하게 보이도록 살짝 눌러줌 */
-    .stage::before {
+    /* 21:9 울트라 와이드 hero 영역 */
+    .hero {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 21 / 9;
+      min-height: max(100vh, 640px);
+      background-color: var(--bg-cream);
+      background-image: url("assets/333.png");
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: cover;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      /* 좌측 하단 서울특별시교육청 로고를 가리지 않도록 하단 패딩 확보 */
+      padding: clamp(40px, 6vh, 80px) clamp(28px, 4.5vw, 72px) clamp(100px, 15vh, 160px);
+      box-sizing: border-box;
+      overflow: hidden;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: high-quality;
+    }
+
+    /* 텍스트/카드 가독성을 위한 좌측 약한 밝은 gradient overlay */
+    .hero::before {
       content: "";
-      position: fixed;
+      position: absolute;
       inset: 0;
-      background: radial-gradient(ellipse at center, rgba(120, 20, 10, 0.25), rgba(120, 20, 10, 0.05) 70%);
       pointer-events: none;
+      background: linear-gradient(
+        90deg,
+        rgba(255, 250, 245, 0.25) 0%,
+        rgba(255, 250, 245, 0.08) 42%,
+        transparent 62%
+      );
+      z-index: 1;
+    }
+
+    .content-wrap {
+      position: relative;
+      width: min(1040px, 57vw);
+      max-width: 100%;
+      z-index: 2;
+    }
+
+    /* 상단 슬로건 헤더 영역 */
+    .header {
+      margin-bottom: clamp(20px, 2.5vh, 32px);
+      animation: rise .6s cubic-bezier(.16, 1, 0.3, 1) forwards;
+    }
+
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-family: "Paperlogy", sans-serif;
+      font-weight: 700;
+      color: #c9511a;
+      background: #ffffff;
+      border-radius: 20px;
+      border: 1.5px solid rgba(255, 255, 255, 0.95);
+      box-shadow: 
+        inset 2px 2px 4px rgba(255, 255, 255, 1),
+        inset -2px -2px 4px rgba(210, 180, 155, 0.25),
+        0 4px 10px rgba(180, 140, 110, 0.12);
+      margin-bottom: 12px;
+      letter-spacing: -.01em;
+    }
+
+    .main-title {
+      font-family: "Paperlogy", sans-serif;
+      font-size: clamp(26px, 2.5vw, 38px);
+      font-weight: 800;
+      line-height: 1.25;
+      letter-spacing: -.03em;
+      color: #4a2e22; /* 깊고 따뜻한 다크브라운 */
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9), 0 3px 10px rgba(130, 85, 60, 0.14);
+      word-break: keep-all;
     }
 
     .cards {
       position: relative;
-      width: min(1600px, 100%);
+      width: 100%;
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: clamp(20px, 2.4vw, 40px);
+      gap: clamp(14px, 1.4vw, 24px);
+      align-items: stretch;
     }
 
+    /* 클레이모피즘 카드 본체 */
     .card {
       --i: 0;
       position: relative;
       display: flex;
       flex-direction: column;
-      padding-top: 52px; /* 태그 높이만큼 */
       color: inherit;
       text-decoration: none;
+      height: 100%;
       opacity: 0;
-      animation: rise .7s cubic-bezier(.2,.8,.2,1) forwards;
-      animation-delay: calc(.1s + var(--i) * .12s);
-    }
-
-    /* 왼쪽 위 사선 타이틀 태그 */
-    .tag {
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 52px;
-      display: flex;
-      align-items: center;
-      padding: 0 44px 0 24px;
-      background: var(--tag);
-      color: #fff;
-      font-size: clamp(16px, 1.3vw, 20px);
-      font-weight: 700;
-      letter-spacing: .02em;
-      clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 100%, 0 100%);
-      transition: background .35s;
-    }
-
-    .body {
-      background: var(--card);
-      box-shadow: 0 10px 30px rgba(90, 15, 5, 0.25);
+      border-radius: 22px;
+      background: var(--clay-card);
+      border: 2px solid rgba(255, 255, 255, 0.95);
+      box-shadow: var(--card-shadow);
+      padding: 0; /* 이중 베젤 방지: 카드 전체를 단일 프레임으로 통일 */
       overflow: hidden;
-      transition: transform .4s cubic-bezier(.2,.8,.2,1), box-shadow .4s;
+      animation: rise .6s cubic-bezier(.16, 1, 0.3, 1) forwards;
+      animation-delay: calc(.1s + var(--i) * .1s);
+      transition: 
+        transform .35s cubic-bezier(.34, 1.56, 0.64, 1),
+        box-shadow .35s ease;
     }
 
+    /* 상단 일체형 풀 블리드 썸네일 (이중 테두리/베젤 완전 제거) */
     .thumb {
       position: relative;
-      aspect-ratio: 16 / 10;
+      width: 100%;
+      aspect-ratio: 600 / 284;
       overflow: hidden;
-      background: linear-gradient(135deg, #3a3f47, #1d2025);
+      background: #f4ece4;
+      border: none;
+      border-bottom: 1px solid rgba(210, 180, 160, 0.25);
+      flex-shrink: 0;
     }
 
     .thumb img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      object-position: top center;
+      object-position: center;
       display: block;
-      transition: transform .6s cubic-bezier(.2,.8,.2,1);
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: high-quality;
+      transform: scale(1.06);
+      transition: transform .4s cubic-bezier(.25, 1, 0.5, 1);
+    }
+
+    /* 중학교 썸네일(2.png)의 여백을 시원하게 채워 모달 중첩 느낌 해소 */
+    .card-mid .thumb img {
+      transform: scale(1.22);
+    }
+
+    /* 썸네일 내부 학교급 배지 (세련된 단일 캡슐 형태) */
+    .badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 2;
+      padding: 4px 12px;
+      font-size: 11.5px;
+      font-family: "Paperlogy", sans-serif;
+      font-weight: 700;
+      letter-spacing: -.01em;
+      color: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    /* 학교급별 배지 컬러 */
+    .card-elem .badge {
+      background: #f29913; /* 초등 옐로우오렌지 */
+    }
+    .card-mid .badge {
+      background: #479e70; /* 중학 세이지그린 */
+    }
+    .card-high .badge {
+      background: #398cd7; /* 고등 스카이블루 */
     }
 
     /* 썸네일 이미지가 아직 없을 때 */
@@ -112,129 +229,364 @@
       inset: 0;
       display: grid;
       place-items: center;
-      color: rgba(255, 255, 255, 0.4);
-      font-size: 15px;
-      letter-spacing: .1em;
+      color: rgba(160, 130, 105, 0.5);
+      font-size: 13px;
+      letter-spacing: .06em;
+      font-weight: 600;
+      font-family: "Paperlogy", sans-serif;
     }
 
     .info {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
-      gap: 16px;
-      padding: clamp(20px, 1.8vw, 30px) clamp(22px, 2vw, 34px);
+      gap: 12px;
+      padding: 16px 18px 18px; /* 하단 텍스트 영역에만 쾌적한 내부 여백 */
+      background: transparent;
+      flex: 1;
+    }
+
+    .info-text {
+      flex: 1;
+      min-width: 0;
     }
 
     .title {
-      font-size: clamp(20px, 1.6vw, 26px);
-      font-weight: 600;
-      letter-spacing: -.01em;
+      font-family: "Paperlogy", sans-serif;
+      font-size: clamp(14px, 1.05vw, 16px);
+      font-weight: 700;
+      letter-spacing: -.02em;
+      line-height: 1.35;
+      color: var(--ink);
+      word-break: keep-all;
     }
 
     .desc {
       margin-top: 6px;
-      font-size: clamp(14px, 1.1vw, 17px);
+      font-size: clamp(11.5px, 0.8vw, 12.5px);
       color: var(--muted);
+      line-height: 1.45;
+      font-weight: 500;
+      word-break: keep-all;
     }
 
+    /* 클레이모피즘 원형 화살표 버튼 */
     .arrow {
       flex: none;
-      width: 44px;
-      height: 44px;
+      width: 34px;
+      height: 34px;
+      margin-top: 2px;
       border-radius: 50%;
       display: grid;
       place-items: center;
-      border: 1.5px solid #d9dbe0;
-      color: var(--muted);
-      font-size: 18px;
-      transition: transform .35s cubic-bezier(.2,.8,.2,1), background .35s, border-color .35s, color .35s;
+      background: #fff8f2;
+      border: 1.5px solid rgba(255, 255, 255, 0.95);
+      box-shadow: 
+        inset 2px 2px 4px rgba(255, 255, 255, 1),
+        inset -2px -2px 4px rgba(210, 185, 165, 0.4),
+        0 4px 10px rgba(160, 130, 105, 0.18);
+      color: var(--orange-accent);
+      font-size: 14px;
+      font-weight: 800;
+      transition: all .28s cubic-bezier(.34, 1.56, 0.64, 1);
     }
 
-    .card:hover .body,
-    .card:focus-visible .body {
-      transform: translateY(-8px);
-      box-shadow: 0 24px 50px rgba(90, 15, 5, 0.4);
+    /* 카드 호버 인터랙션: 부드러운 리프트 & 미세 줌인 */
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--card-shadow-hover);
     }
 
-    .card:hover .tag,
-    .card:focus-visible .tag { background: var(--red-deep); }
-
-    .card:hover .thumb img,
-    .card:focus-visible .thumb img { transform: scale(1.06); }
-
-    .card:hover .arrow,
-    .card:focus-visible .arrow {
-      transform: rotate(-45deg);
-      background: var(--red);
-      border-color: var(--red);
-      color: #fff;
+    .card:hover .badge {
+      transform: scale(1.04);
     }
 
-    .card:focus-visible { outline: none; }
-    .card:focus-visible .body { outline: 3px solid #fff; outline-offset: 3px; }
+    /* 꽉 찬 이미지에서 아주 조금만 살짝 줌인 */
+    .card:hover .thumb img {
+      transform: scale(1.09);
+    }
+    .card-mid:hover .thumb img {
+      transform: scale(1.25);
+    }
+
+    .card:hover .arrow {
+      background: var(--orange-accent);
+      color: #ffffff;
+      border-color: var(--orange-accent);
+      box-shadow: 
+        inset 2px 2px 4px rgba(255, 255, 255, 0.45),
+        inset -2px -2px 4px rgba(0, 0, 0, 0.22),
+        0 6px 14px rgba(232, 99, 56, 0.4);
+      transform: translateX(3px) scale(1.06);
+    }
+
+    .card:active {
+      transform: translateY(-2px) scale(0.99);
+    }
+
+    .card:focus-visible { 
+      outline: none; 
+      border-color: var(--orange-accent); 
+      box-shadow: 0 0 0 3px rgba(232, 99, 56, 0.35); 
+    }
 
     @keyframes rise {
-      from { opacity: 0; transform: translateY(20px); }
+      from { opacity: 0; transform: translateY(18px); }
       to   { opacity: 1; transform: none; }
     }
 
-    @media (max-width: 900px) {
-      body { background-attachment: scroll; }
-      .cards { grid-template-columns: minmax(0, 1fr); max-width: 520px; }
-      .stage { padding: 32px 16px; }
+    /* 왼쪽 하단 서울특별시교육청 로고 */
+    .footer-logo {
+      position: fixed;
+      left: clamp(28px, 4.5vw, 68px);
+      bottom: clamp(24px, 3.5vh, 44px);
+      z-index: 10;
+      display: inline-flex;
+      align-items: center;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .footer-logo img {
+      height: clamp(34px, 3vw, 44px);
+      width: auto;
+      display: block;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: high-quality;
+      filter: drop-shadow(0 2px 5px rgba(180, 140, 110, 0.18));
+    }
+
+    /* 오른쪽 하단 AI 생성 이미지 표기 (교육청 로고와 시각적 균형) */
+    .ai-notice {
+      position: fixed;
+      right: clamp(28px, 4.5vw, 68px);
+      bottom: clamp(24px, 3.5vh, 44px);
+      z-index: 10;
+      display: inline-flex;
+      align-items: center;
+      min-height: clamp(34px, 3vw, 44px);
+      font-size: clamp(14px, 1.15vw, 17px);
+      font-weight: 300;
+      color: rgba(90, 75, 65, 0.85);
+      letter-spacing: -.02em;
+      pointer-events: none;
+      user-select: none;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+    }
+
+    /* 가이드북 & E-BOOK 액션 바 */
+    .action-bar {
+      display: flex;
+      align-items: center;
+      gap: clamp(10px, 1.2vw, 16px);
+      margin-top: clamp(18px, 2.2vh, 26px);
+      flex-wrap: wrap;
+      animation: rise .6s cubic-bezier(.16, 1, 0.3, 1) forwards;
+      animation-delay: .4s;
+      opacity: 0;
+    }
+
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: clamp(9px, 1.1vh, 12px) clamp(18px, 1.6vw, 24px);
+      border-radius: 24px;
+      font-family: "Paperlogy", sans-serif;
+      font-size: clamp(13px, 0.95vw, 14.5px);
+      font-weight: 700;
+      letter-spacing: -.02em;
+      text-decoration: none;
+      box-sizing: border-box;
+      white-space: nowrap;
+      background: #ffffff;
+      color: #3d312a;
+      border: 1.5px solid rgba(255, 255, 255, 0.95);
+      box-shadow: 
+        inset 2px 2px 4px rgba(255, 255, 255, 1),
+        inset -2px -2px 5px rgba(210, 185, 165, 0.3),
+        0 6px 14px rgba(160, 130, 105, 0.12);
+      transition: 
+        transform .22s ease,
+        background-color .22s ease,
+        color .22s ease,
+        box-shadow .22s ease;
+    }
+
+    .btn-arrow {
+      font-size: 0.95em;
+      opacity: 0.7;
+      transition: transform .2s ease, opacity .2s ease;
+    }
+
+    /* 부드럽고 은은한 호버 피드백 (과하지 않게 완화) */
+    .action-btn:hover {
+      transform: translateY(-2px);
+      background: #fff8f2;
+      color: #e86338;
+      box-shadow: 
+        inset 2px 2px 4px rgba(255, 255, 255, 1),
+        inset -2px -2px 5px rgba(210, 185, 165, 0.35),
+        0 8px 18px rgba(160, 130, 105, 0.18);
+    }
+
+    .action-btn:hover .btn-arrow {
+      opacity: 1;
+      transform: translate(2px, -2px);
+    }
+
+    .action-btn:active {
+      transform: translateY(0);
+    }
+
+    @media (max-width: 1100px) {
+      .content-wrap {
+        width: min(840px, 68vw);
+      }
+      .hero {
+        padding: clamp(40px, 6vh, 70px) 24px clamp(80px, 12vh, 120px);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero {
+        aspect-ratio: auto;
+        min-height: 720px;
+        background-position: 65% center;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 50px 20px 60px;
+      }
+      .content-wrap {
+        width: 100%;
+        max-width: 440px;
+        margin-top: 20px;
+      }
+      .cards {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 18px;
+      }
+      .main-title {
+        text-align: center;
+      }
+      .header-badge {
+        display: table;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .action-bar {
+        justify-content: center;
+        width: 100%;
+        margin-top: 20px;
+      }
+      .action-btn {
+        flex: 1 1 calc(50% - 8px);
+        justify-content: center;
+      }
+      .footer-logo {
+        position: relative;
+        left: auto;
+        bottom: auto;
+        margin-top: 36px;
+        justify-content: center;
+        width: 100%;
+      }
+      .footer-logo img {
+        height: 32px;
+      }
+      .ai-notice {
+        position: relative;
+        right: auto;
+        bottom: auto;
+        margin-top: 16px;
+        text-align: center;
+        width: 100%;
+        display: block;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .card { animation: none; opacity: 1; }
-      .body, .thumb img, .arrow { transition: none; }
+      .card, .header, .action-bar { animation: none; opacity: 1; transition: none; }
+      .thumb img, .arrow, .badge, .action-btn { transition: none; }
     }
   </style>
 </head>
 <body>
-  <main class="stage">
-    <nav class="cards" aria-label="학교급별 바로가기">
-      <a class="card" style="--i:0" href="https://example.com/elementary" target="_blank" rel="noopener">
-        <span class="tag">초등학교</span>
-        <div class="body">
-          <div class="thumb"><img src="assets/thumbs/elementary.png" alt="" onerror="this.parentNode.classList.add('empty'); this.remove()" /></div>
-          <div class="info">
-            <div>
-              <div class="title">AI 에이전트 미리보기</div>
-              <div class="desc">초등학교 판</div>
-            </div>
-            <span class="arrow" aria-hidden="true">→</span>
-          </div>
-        </div>
-      </a>
+  <!-- 21:9 울트라 와이드 hero 섹션 -->
+  <main class="hero">
+    <div class="content-wrap">
+      <!-- 상단 슬로건 텍스트 -->
+      <header class="header">
+        <span class="header-badge">협력적 수업설계 AI 에이전트</span>
+        <h1 class="main-title">함께 만드는 수업<br>서로 깊어지는 배움</h1>
+      </header>
 
-      <a class="card" style="--i:1" href="https://example.com/middle" target="_blank" rel="noopener">
-        <span class="tag">중학교</span>
-        <div class="body">
-          <div class="thumb"><img src="assets/thumbs/middle.png" alt="" onerror="this.parentNode.classList.add('empty'); this.remove()" /></div>
+      <!-- 3D 클레이모피즘 바로가기 카드들 -->
+      <nav class="cards" aria-label="학교급별 바로가기">
+        <a class="card card-elem" style="--i:0" href="https://togethertr.web.app/" target="_blank" rel="noopener">
+          <div class="thumb">
+            <span class="badge">초등학교</span>
+            <img src="assets/1.png?v=2" alt="초등학교 AI 에이전트" onerror="this.parentNode.classList.add('empty'); this.remove()" />
+          </div>
           <div class="info">
-            <div>
-              <div class="title">AI 에이전트 미리보기</div>
-              <div class="desc">중학교 판</div>
+            <div class="info-text">
+              <div class="title">교과를 잇는 통합 수업 설계</div>
+              <div class="desc">담임 교사가 여러 교과를 연결해 배움의 흐름을 만듭니다.</div>
             </div>
             <span class="arrow" aria-hidden="true">→</span>
           </div>
-        </div>
-      </a>
+        </a>
 
-      <a class="card" style="--i:2" href="https://example.com/high" target="_blank" rel="noopener">
-        <span class="tag">고등학교</span>
-        <div class="body">
-          <div class="thumb"><img src="assets/thumbs/high.png" alt="" onerror="this.parentNode.classList.add('empty'); this.remove()" /></div>
+        <a class="card card-mid" style="--i:1" href="https://teaching-designer.vercel.app/" target="_blank" rel="noopener">
+          <div class="thumb">
+            <span class="badge">중학교</span>
+            <img src="assets/2.png?v=2" alt="중학교 AI 에이전트" onerror="this.parentNode.classList.add('empty'); this.remove()" />
+          </div>
           <div class="info">
-            <div>
-              <div class="title">AI 에이전트 미리보기</div>
-              <div class="desc">고등학교 판</div>
+            <div class="info-text">
+              <div class="title">교과 전문가의 협력적 수업 설계</div>
+              <div class="desc">여러 교과 교사가 함께 프로젝트 수업을 기획하고 의견을 나눕니다.</div>
             </div>
             <span class="arrow" aria-hidden="true">→</span>
           </div>
-        </div>
-      </a>
-    </nav>
+        </a>
+
+        <a class="card card-high" style="--i:2" href="https://curriculum-weaver.vercel.app/guide" target="_blank" rel="noopener">
+          <div class="thumb">
+            <span class="badge">고등학교</span>
+            <img src="assets/3.png?v=2" alt="고등학교 AI 에이전트" onerror="this.parentNode.classList.add('empty'); this.remove()" />
+          </div>
+          <div class="info">
+            <div class="info-text">
+              <div class="title">성취기준 기반 맞춤 수업 설계</div>
+              <div class="desc">과목과 진로를 연결해 깊이 있는 배움의 경험을 설계합니다.</div>
+            </div>
+            <span class="arrow" aria-hidden="true">→</span>
+          </div>
+        </a>
+      </nav>
+
+      <!-- 가이드북 다운로드 및 E-BOOK 보기 버튼 바 -->
+      <div class="action-bar">
+        <a class="action-btn" href="https://onlinebooks.co.kr/books/tcid/#p=1" target="_blank" rel="noopener">
+          <span>E-BOOK 보기</span>
+          <span class="btn-arrow" aria-hidden="true">↗</span>
+        </a>
+        <a class="action-btn" href="https://buseo.sen.go.kr/buseo/bu10/user/bbs/BD_selectBbs.do?q_bbsSn=1240&q_bbsDocNo=20260921154521544" target="_blank" rel="noopener">
+          <span>가이드북 다운로드</span>
+          <span class="btn-arrow" aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </div>
   </main>
+
+  <!-- 왼쪽 하단 서울특별시교육청 로고 -->
+  <div class="footer-logo">
+    <img src="assets/sen-logo.png" alt="서울특별시교육청" />
+  </div>
+
+  <!-- 오른쪽 하단 AI 생성 이미지 표기 -->
+  <p class="ai-notice">AI로 생성된 이미지입니다.</p>
 </body>
 </html>
