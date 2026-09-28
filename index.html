@@ -242,9 +242,30 @@
       justify-content: space-between;
       gap: 12px;
       padding: 16px 18px 18px; /* 하단 텍스트 영역에만 쾌적한 내부 여백 */
-      background: transparent;
+      background: #faf7f4;
       flex: 1;
+      transition: background-color .3s ease;
     }
+
+    /* 학교급별 하단 텍스트 영역 은은한 파스텔 틴트 */
+    .card-elem .info {
+      background: linear-gradient(180deg, rgba(255, 253, 248, 0.8) 0%, rgba(254, 246, 232, 0.65) 100%);
+    }
+    .card-mid .info {
+      background: linear-gradient(180deg, rgba(250, 254, 251, 0.8) 0%, rgba(236, 248, 241, 0.65) 100%);
+    }
+    .card-high .info {
+      background: linear-gradient(180deg, rgba(250, 253, 255, 0.8) 0%, rgba(236, 244, 254, 0.65) 100%);
+    }
+
+    /* 학교급별 화살표 포인트 톤온톤 */
+    .card-elem .arrow { color: #d97706; }
+    .card-mid .arrow { color: #2e7d58; }
+    .card-high .arrow { color: #2563eb; }
+
+    .card-elem:hover .arrow { background: #f29913; border-color: #f29913; color: #fff; }
+    .card-mid:hover .arrow { background: #479e70; border-color: #479e70; color: #fff; }
+    .card-high:hover .arrow { background: #398cd7; border-color: #398cd7; color: #fff; }
 
     .info-text {
       flex: 1;
