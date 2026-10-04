@@ -470,6 +470,124 @@
       transform: translateY(0);
     }
 
+    /* 탁자 위 빨간 책: 연수 수강생 전용 비밀 링크 (위치는 스크립트가 배경 이미지에 맞춰 계산) */
+    .secret-book {
+      position: absolute;
+      z-index: 1; /* 배경 그라디언트 위, 카드 아래 */
+      cursor: default; /* 비밀 링크이므로 포인터 모양을 바꾸지 않음 */
+      /* 책 표지+책등 모양으로 클릭 영역을 맞춤 */
+      clip-path: polygon(1% 26%, 57% 0%, 100% 60%, 100% 76%, 37% 100%, 1% 42%);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* SECRET CODE 입력창 */
+    .secret-dialog {
+      margin: auto;
+      width: min(360px, calc(100% - 32px));
+      padding: 0;
+      border: 2px solid rgba(255, 255, 255, 0.95);
+      border-radius: 24px;
+      background: #fffaf5;
+      color: var(--ink);
+      box-shadow: var(--card-shadow-hover);
+    }
+
+    .secret-dialog::backdrop {
+      background: rgba(60, 40, 30, 0.35);
+      backdrop-filter: blur(3px);
+    }
+
+    .secret-dialog[open] {
+      animation: rise .35s cubic-bezier(.16, 1, 0.3, 1);
+    }
+
+    .secret-form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px 26px 24px;
+      text-align: center;
+    }
+
+    .secret-title {
+      font-family: "Paperlogy", sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      color: #c9511a;
+    }
+
+    .secret-sub {
+      margin-top: 8px;
+      font-size: 13.5px;
+      color: var(--muted);
+      word-break: keep-all;
+    }
+
+    .secret-input {
+      width: 100%;
+      margin-top: 20px;
+      padding: 12px 16px;
+      font-family: "Paperlogy", sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: .2em;
+      text-align: center;
+      color: var(--ink);
+      background: #ffffff;
+      border: 1.5px solid #ecdccf;
+      border-radius: 14px;
+      box-shadow: var(--thumb-clay-shadow);
+      outline: none;
+      transition: border-color .2s ease;
+    }
+
+    .secret-input:focus {
+      border-color: var(--orange-accent);
+    }
+
+    .secret-input.shake {
+      animation: shake .4s ease;
+      border-color: #d64545;
+    }
+
+    .secret-error {
+      min-height: 20px;
+      margin-top: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #d64545;
+    }
+
+    .secret-actions {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      margin-top: 6px;
+    }
+
+    .secret-actions .action-btn {
+      flex: 1;
+      cursor: pointer;
+    }
+
+    .secret-actions .secret-enter {
+      background: var(--orange-accent);
+      color: #ffffff;
+      border-color: var(--orange-accent);
+    }
+
+    .secret-actions .secret-enter:hover {
+      background: #d4552c;
+      color: #ffffff;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+
     @media (max-width: 1100px) {
       .content-wrap {
         width: min(840px, 68vw);
@@ -539,12 +657,16 @@
     @media (prefers-reduced-motion: reduce) {
       .card, .header, .action-bar { animation: none; opacity: 1; transition: none; }
       .thumb img, .arrow, .badge, .action-btn { transition: none; }
+      .secret-dialog[open], .secret-input.shake { animation: none; }
     }
   </style>
 </head>
 <body>
   <!-- 21:9 울트라 와이드 hero 섹션 -->
   <main class="hero">
+    <!-- 탁자 위 빨간 책 (연수 수강생 전용 비밀 링크) -->
+    <div class="secret-book" id="secretBook" aria-hidden="true"></div>
+
     <div class="content-wrap">
       <!-- 상단 슬로건 텍스트 -->
       <header class="header">
@@ -618,5 +740,92 @@
 
   <!-- 오른쪽 하단 AI 생성 이미지 표기 -->
   <p class="ai-notice">AI로 생성된 이미지입니다.</p>
+
+  <!-- SECRET CODE 입력창 -->
+  <dialog class="secret-dialog" id="secretDialog" aria-labelledby="secretTitle">
+    <form class="secret-form" id="secretForm">
+      <div class="secret-title" id="secretTitle">SECRET CODE</div>
+      <p class="secret-sub">연수 수강생 전용 공간입니다.<br>비밀 코드를 입력하세요.</p>
+      <input class="secret-input" id="secretInput" type="text" autocomplete="off" spellcheck="false" aria-label="비밀 코드" />
+      <p class="secret-error" id="secretError" role="alert"></p>
+      <div class="secret-actions">
+        <button class="action-btn" type="button" id="secretCancel">취소</button>
+        <button class="action-btn secret-enter" type="submit">입장하기</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script>
+    (function () {
+      // 재미 요소용 비밀 링크 (보안 목적 아님)
+      var SECRET_CODE = "93/4";
+      var SECRET_URL = "https://padlet.com/jammanbogem/padlet-s0244k10888hwjtu3lub";
+
+      // hero.png 원본 크기와 원본 기준 책 위치(px)
+      var IMG_W = 1916, IMG_H = 821;
+      var BOOK = { x: 1248, y: 541, w: 246, h: 116 };
+
+      var hero = document.querySelector(".hero");
+      var book = document.getElementById("secretBook");
+      var dialog = document.getElementById("secretDialog");
+      var form = document.getElementById("secretForm");
+      var input = document.getElementById("secretInput");
+      var error = document.getElementById("secretError");
+
+      // background-size: cover 계산을 그대로 따라가 책 위에 클릭 영역을 맞춤
+      function placeBook() {
+        var w = hero.clientWidth, h = hero.clientHeight;
+        var s = Math.max(w / IMG_W, h / IMG_H);
+        var cs = getComputedStyle(hero);
+        var px = parseFloat(cs.backgroundPositionX) / 100;
+        var py = parseFloat(cs.backgroundPositionY) / 100;
+        var ox = (w - IMG_W * s) * px, oy = (h - IMG_H * s) * py;
+        book.style.left = ox + BOOK.x * s + "px";
+        book.style.top = oy + BOOK.y * s + "px";
+        book.style.width = BOOK.w * s + "px";
+        book.style.height = BOOK.h * s + "px";
+      }
+
+      placeBook();
+      if (window.ResizeObserver) new ResizeObserver(placeBook).observe(hero);
+      else window.addEventListener("resize", placeBook);
+
+      book.addEventListener("click", function () {
+        dialog.showModal();
+        input.focus();
+      });
+
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        if (input.value.replace(/\s/g, "") === SECRET_CODE) {
+          var win = window.open(SECRET_URL, "_blank");
+          if (win) win.opener = null;
+          else location.href = SECRET_URL; // 팝업 차단 시 현재 탭에서 이동
+          dialog.close();
+        } else {
+          error.textContent = "코드가 올바르지 않습니다.";
+          input.classList.remove("shake");
+          void input.offsetWidth; // 흔들림 애니메이션 재시작
+          input.classList.add("shake");
+          input.select();
+        }
+      });
+
+      document.getElementById("secretCancel").addEventListener("click", function () {
+        dialog.close();
+      });
+
+      // 바깥(배경) 클릭 시 닫기
+      dialog.addEventListener("click", function (e) {
+        if (e.target === dialog) dialog.close();
+      });
+
+      dialog.addEventListener("close", function () {
+        input.value = "";
+        error.textContent = "";
+        input.classList.remove("shake");
+      });
+    })();
+  </script>
 </body>
 </html>
